@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin — Haiti National Investment Fund</title>
+  <link rel="stylesheet" href="styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+  <style>
+    .admin-search-bar {
+      display: flex; align-items: center; gap: 10px;
+      background: rgba(255,255,255,0.08); border-radius: 8px;
+      padding: 8px 14px; border: 1px solid rgba(255,255,255,0.15);
+    }
+    .admin-search-bar input {
+      background: transparent; border: none; outline: none; color: white;
+      font-size: 0.875rem; width: 240px;
+    }
+    .admin-search-bar input::placeholder { color: rgba(255,255,255,0.4); }
+    .msg-item {
+      padding: 16px; border-bottom: 1px solid var(--gray-100);
+      cursor: pointer; transition: var(--transition);
+    }
+    .msg-item:hover { background: var(--gray-50); }
+    .msg-item.unread { border-left: 3px solid var(--haiti-red); }
+    .msg-item.read   { border-left: 3px solid transparent; }
+    .msg-from { font-weight: 600; font-size: 0.9rem; color: var(--gray-800); }
+    .msg-subject { font-size: 0.85rem; color: var(--gray-700); margin: 2px 0; }
+    .msg-preview { font-size: 0.8rem; color: var(--gray-400); }
+    .msg-time { font-size: 0.72rem; color: var(--gray-400); }
+    .chart-line {
+      display: flex; align-items: flex-end; gap: 4px; height: 120px;
+      padding: 0 4px;
+    }
+    .chart-line-bar {
+      flex: 1; border-radius: 3px 3px 0 0; min-height: 4px;
+      transition: height 0.6s ease; cursor: pointer; position: relative;
+    }
+    .chart-line-bar:hover::after {
+      content: attr(data-tip);
+      position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
+      background: rgba(0,0,0,0.75); color: white; font-size: 0.65rem; padding: 3px 7px;
+      border-radius: 4px; white-space: nowrap; pointer-events: none; margin-bottom: 4px;
+    }
+    .visitors-chart-labels {
+      display: flex; gap: 4px; margin-top: 4px; padding: 0 4px;
+    }
+    .vcl { flex: 1; text-align: center; font-size: 0.58rem; color: var(--gray-400); overflow: hidden; }
+  </style>
+</head>
+<body style="background:var(--gray-100)">
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- ADMIN LOGIN PAGE -->
+  <div id="admin-login-page" class="admin-login-page">
+    <div style="width:100%;max-width:420px;padding:16px">
+      <div class="text-center" style="margin-bottom:32px">
+        <div id="login-emblem" style="display:flex;justify-content:center;margin-bottom:16px"></div>
+        <h1 style="color:white;font-family:var(--font-display);font-size:1.8rem">Admin Portal</h1>
+        <p style="color:rgba(255,255,255,0.5);margin-top:4px">Restricted access — authorized personnel only</p>
+      </div>
+      <div class="admin-login-box">
+        <div style="height:4px;background:linear-gradient(to right,var(--haiti-blue),var(--haiti-red));border-radius:8px 8px 0 0;margin:-40px -40px 32px"></div>
+        <form id="admin-login-form">
+          <div class="form-group" style="margin-bottom:18px">
+            <label class="form-label">Admin Username</label>
+            <input type="text" class="form-control" id="admin-user" placeholder="admin" value="admin">
+          </div>
+          <div class="form-group" style="margin-bottom:24px">
+            <label class="form-label">Password</label>
+            <input type="password" class="form-control" id="admin-pass" placeholder="••••••••" value="admin2024">
+          </div>
+          <div id="admin-login-error" class="hidden" style="color:var(--error);font-size:0.85rem;margin-bottom:16px">
+            ❌ Invalid credentials. Try admin / admin2024
+          </div>
+          <button type="submit" class="btn btn-primary btn-full btn-lg">Access Admin Dashboard</button>
+          <div style="text-align:center;margin-top:16px">
+            <a href="index.html" style="font-size:0.8rem;color:var(--gray-400)">← Back to Public Portal</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADMIN DASHBOARD PAGE -->
+  <div id="admin-dashboard-page" class="hidden">
+
+    <!-- Admin Navbar -->
+    <nav class="admin-navbar">
+      <div class="container admin-navbar-inner">
+        <div class="admin-brand">
+          <span style="font-size:1.3rem">⚙️</span>
+          <span>Admin Dashboard</span>
+          <span id="unread-badge" class="admin-badge" style="margin-left:4px"></span>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px">
+          <div class="admin-search-bar">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" id="global-search" placeholder="Search investors...">
+          </div>
+          <div class="admin-nav-links" id="admin-nav-links">
+            <button onclick="showSection('stats')" data-section="stats" class="active">📊 Stats</button>
+            <button onclick="showSection('potential')" data-section="potential">⏳ Potential</button>
+            <button onclick="showSection('confirmed')" data-section="confirmed">✅ Confirmed</button>
+            <button onclick="showSection('messages')" data-section="messages">
+              ✉️ Messages
+              <span id="nav-msg-badge" class="admin-badge"></span>
+            </button>
+            <button class="btn-admin-logout" onclick="adminLogout()">🚪 Logout</button>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Dashboard Body -->
+    <div style="padding:32px 0;min-height:calc(100vh - 64px)">
+      <div class="container">
+
+        <!-- STATS SECTION -->
+        <div class="admin-section active" id="section-stats">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:28px">
+            <div>
+              <h2 style="color:var(--gray-900);font-size:1.4rem">Dashboard Overview</h2>
+              <p style="color:var(--gray-500);font-size:0.875rem;margin-top:4px" id="last-updated"></p>
+            </div>
+            <button class="btn btn-red" onclick="openBulkContactModal()">📢 Contact All Investors</button>
+          </div>
+
+          <!-- Stat Cards -->
+          <div class="stats-grid" style="margin-bottom:28px">
+            <div class="stat-card">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start">
+                <div>
+                  <div class="stat-label">Total Visitors (30 days)</div>
+                  <div class="stat-value" id="stat-visitors">—</div>
+                  <div class="stat-change positive" id="stat-visitors-change">↑ 12% vs last period</div>
+                </div>
+                <div class="stat-icon" style="background:#EEF2FF;color:var(--haiti-blue)">👥</div>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start">
+                <div>
+                  <div class="stat-label">Potential Investors</div>
+                  <div class="stat-value" id="stat-potential">—</div>
+                  <div class="stat-label" style="margin-top:4px">Total Pledged: <strong id="stat-pledged">—</strong></div>
+                </div>
+                <div class="stat-icon" style="background:#FEF3C7;color:#92400E">⏳</div>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start">
+                <div>
+                  <div class="stat-label">Confirmed Investors</div>
+                  <div class="stat-value" id="stat-confirmed">—</div>
+                  <div class="stat-label" style="margin-top:4px">Total Received: <strong id="stat-received-admin">—</strong></div>
+                </div>
+                <div class="stat-icon" style="background:#D1FAE5;color:#065F46">✅</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Charts Row -->
+          <div style="display:grid;grid-template-columns:2fr 1fr;gap:20px;margin-bottom:28px" id="charts-grid">
+            <div class="chart-wrapper">
+              <div class="chart-title">📈 Daily Visitor Traffic (Last 30 Days)</div>
+              <div class="chart-line" id="visitor-chart"></div>
+              <div class="visitors-chart-labels" id="visitor-labels"></div>
+            </div>
+            <div class="chart-wrapper">
+              <div class="chart-title">💰 Investment Distribution</div>
+              <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px" id="inv-distribution"></div>
+            </div>
+          </div>
+
+          <!-- Recent Activity -->
+          <div class="chart-wrapper">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+              <div class="chart-title">🕐 Recent Registrations</div>
+              <button class="btn btn-ghost btn-sm" onclick="showSection('confirmed')">View All →</button>
+            </div>
+            <div id="recent-activity"></div>
+          </div>
+        </div>
+
+        <!-- POTENTIAL INVESTORS SECTION -->
+        <div class="admin-section" id="section-potential">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px">
+            <div>
+              <h2 style="color:var(--gray-900);font-size:1.4rem">⏳ Potential Investors</h2>
+              <p style="color:var(--gray-500);font-size:0.875rem;margin-top:4px">Registered but payment not yet made</p>
+            </div>
+            <div style="display:flex;gap:10px;align-items:center">
+              <div class="search-bar" style="width:280px">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <input type="text" placeholder="Search potential investors..." id="potential-search" oninput="searchPotential(this.value)">
+              </div>
+              <button class="btn btn-red btn-sm" onclick="openBulkContactModal()">📢 Contact All</button>
+            </div>
+          </div>
+          <div class="card">
+            <div id="potential-table"></div>
+          </div>
+        </div>
+
+        <!-- CONFIRMED INVESTORS SECTION -->
+        <div class="admin-section" id="section-confirmed">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px">
+            <div>
+              <h2 style="color:var(--gray-900);font-size:1.4rem">✅ Confirmed Investors</h2>
+              <p style="color:var(--gray-500);font-size:0.875rem;margin-top:4px">Payment confirmed and processed</p>
+            </div>
+            <div style="display:flex;gap:10px;align-items:center">
+              <div class="search-bar" style="width:280px">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <input type="text" placeholder="Search confirmed investors..." id="confirmed-search" oninput="searchConfirmed(this.value)">
+              </div>
+              <button class="btn btn-red btn-sm" onclick="openBulkContactModal()">📢 Contact All</button>
+            </div>
+          </div>
+          <div class="card">
+            <div id="confirmed-table"></div>
+          </div>
+        </div>
+
+        <!-- MESSAGES SECTION -->
+        <div class="admin-section" id="section-messages">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
+            <div>
+              <h2 style="color:var(--gray-900);font-size:1.4rem">✉️ Inbox</h2>
+              <p style="color:var(--gray-500);font-size:0.875rem;margin-top:4px">Messages from investors and inquiries</p>
+            </div>
+            <span id="inbox-count" class="badge badge-red"></span>
+          </div>
+          <div style="display:grid;grid-template-columns:360px 1fr;gap:20px" id="messages-grid">
+            <div class="card" style="overflow:hidden">
+              <div style="background:var(--gray-50);padding:14px 16px;border-bottom:1px solid var(--gray-100);font-size:0.8rem;font-weight:700;color:var(--gray-600);text-transform:uppercase;letter-spacing:0.06em">
+                All Messages
+              </div>
+              <div id="messages-list" style="max-height:600px;overflow-y:auto"></div>
+            </div>
+            <div class="card" id="message-detail-panel">
+              <div style="display:flex;align-items:center;justify-content:center;height:300px;color:var(--gray-400);flex-direction:column;gap:12px">
+                <span style="font-size:2.5rem">✉️</span>
+                <span>Select a message to read</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+  <script src="components.js"></script>
+  <script>
+    let isAdminAuthenticated = false;
+    let potentialTable, confirmedTable;
+
+    // ── Admin login ───────────────────────────
+    document.addEventListener('DOMContentLoaded', function() {
+      document.getElementById('login-emblem').innerHTML = HaitiEmblem({ size: 72 });
+      document.getElementById('last-updated').textContent =
+        'Last updated: ' + new Date().toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+      document.getElementById('admin-login-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const user = document.getElementById('admin-user').value;
+        const pass = document.getElementById('admin-pass').value;
+        if (user === 'admin' && pass === 'admin2024') {
+          isAdminAuthenticated = true;
+          document.getElementById('admin-login-page').classList.add('hidden');
+          document.getElementById('admin-dashboard-page').classList.remove('hidden');
+          initAdminDashboard();
+        } else {
+          document.getElementById('admin-login-error').classList.remove('hidden');
+        }
+      });
+    });
+
+    function adminLogout() {
+      isAdminAuthenticated = false;
+      document.getElementById('admin-login-page').classList.remove('hidden');
+      document.getElementById('admin-dashboard-page').classList.add('hidden');
+    }
+
+    function showSection(name) {
+      document.querySelectorAll('.admin-section').forEach(s => s.classList.toggle('active', s.id === `section-${name}`));
+      document.querySelectorAll('[data-section]').forEach(b => b.classList.toggle('active', b.dataset.section === name));
+    }
+
+    // ── Init Admin Dashboard ──────────────────
+    function initAdminDashboard() {
+      const stats = window.APP.getStats();
+
+      // Unread badge
+      updateBadges(stats.unreadCount);
+
+      // Stat cards
+      document.getElementById('stat-visitors').textContent = stats.totalVisitors.toLocaleString();
+      document.getElementById('stat-potential').textContent = stats.potential;
+      document.getElementById('stat-confirmed').textContent = stats.confirmed;
+      document.getElementById('stat-pledged').textContent = formatCurrency(stats.totalPledged);
+      document.getElementById('stat-received-admin').textContent = formatCurrency(stats.totalReceived);
+
+      // Visitor chart
+      const visitors = window.APP.get('visitors').slice(-30);
+      const maxV = Math.max(...visitors.map(v => v.visitors));
+      const vc = document.getElementById('visitor-chart');
+      const vl = document.getElementById('visitor-labels');
+      vc.innerHTML = visitors.map(v => `
+        <div class="chart-line-bar"
+          style="height:${Math.max(4,(v.visitors/maxV)*116)}px;background:${v.visitors > maxV*0.7 ? 'var(--haiti-blue)' : 'var(--haiti-blue-light)'};opacity:0.85"
+          data-tip="${v.date}: ${v.visitors} visitors">
+        </div>`).join('');
+      vl.innerHTML = visitors.filter((_,i) => i % 5 === 0).map(v => `
+        <div class="vcl" style="flex:5">${v.date.slice(5)}</div>`).join('');
+
+      // Investment distribution
+      const confirmed = window.APP.get('confirmedInvestors');
+      const potential = window.APP.get('potentialInvestors');
+      const allInv = [...confirmed, ...potential];
+      const ranges = {};
+      allInv.forEach(inv => {
+        ranges[inv.amountRange] = (ranges[inv.amountRange] || 0) + 1;
+      });
+      const totalCount = allInv.length;
+      const distEl = document.getElementById('inv-distribution');
+      distEl.innerHTML = Object.entries(ranges).map(([range, count]) => {
+        const pct = Math.round((count / totalCount) * 100);
+        return `
+          <div>
+            <div style="display:flex;justify-content:space-between;font-size:0.78rem;margin-bottom:3px">
+              <span style="color:var(--gray-600)">${range}</span>
+              <span style="font-weight:600;color:var(--gray-800)">${count} (${pct}%)</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-bar-fill" style="width:${pct}%"></div>
+            </div>
+          </div>`;
+      }).join('');
+
+      // Recent activity
+      const recent = [...confirmed, ...potential].sort((a,b) => b.registeredAt.localeCompare(a.registeredAt)).slice(0, 5);
+      document.getElementById('recent-activity').innerHTML = `
+        <table class="data-table">
+          <thead><tr><th>Date</th><th>ID</th><th>Name</th><th>Amount</th><th>Status</th><th>Action</th></tr></thead>
+          <tbody>
+            ${recent.map(inv => `
+              <tr>
+                <td>${formatDate(inv.registeredAt)}</td>
+                <td><span style="font-family:monospace;font-weight:600">#${inv.id}</span></td>
+                <td>${inv.firstName} ${inv.lastName}</td>
+                <td style="font-weight:600;color:var(--haiti-blue)">${formatCurrency(inv.exactAmount)}</td>
+                <td><span class="badge ${inv.status === 'confirmed' ? 'badge-green' : 'badge-yellow'}">
+                  ${inv.status === 'confirmed' ? '✅ Confirmed' : '⏳ Potential'}
+                </span></td>
+                <td><button class="btn btn-sm btn-outline" onclick="openContactModal('${inv.id}','${(inv.firstName+' '+inv.lastName).replace(/'/g,"\\'")}','${inv.email}')">✉️</button></td>
+              </tr>`).join('')}
+          </tbody>
+        </table>`;
+
+      // Tables
+      const INVESTOR_COLS = [
+        { key: 'registeredAt', label: 'Date', render: r => formatDate(r.registeredAt) },
+        { key: 'id', label: 'ID', render: r => `<span style="font-family:monospace;font-weight:700">#${r.id}</span>` },
+        { key: 'firstName', label: 'Name', render: r => `${r.firstName} ${r.lastName}` },
+        { key: 'exactAmount', label: 'Amount', render: r => `<span style="font-weight:700;color:var(--haiti-blue)">${formatCurrency(r.exactAmount)}</span>` },
+        { key: 'amountRange', label: 'Range' },
+        { key: 'email', label: 'Email', render: r => `<a href="mailto:${r.email}" style="color:var(--haiti-blue)">${r.email}</a>` },
+        { key: 'whatsapp', label: 'WhatsApp' },
+        { key: 'country', label: 'Country' }
+      ];
+
+      potentialTable = new DataTable('potential-table', INVESTOR_COLS, potential);
+      confirmedTable = new DataTable('confirmed-table', [
+        ...INVESTOR_COLS,
+        { key: 'totalInvested', label: 'Invested', render: r => `<span style="font-weight:700;color:var(--success)">${formatCurrency(r.totalInvested)}</span>` },
+        { key: 'transactionId', label: 'Transaction ID' },
+        { key: 'confirmedAt', label: 'Confirmed', render: r => formatDate(r.confirmedAt) }
+      ], confirmed);
+
+      // Messages
+      renderMessages();
+
+      // Global search
+      document.getElementById('global-search').addEventListener('input', debounce(function(e) {
+        const q = e.target.value.trim();
+        if (!q) return;
+        const results = window.APP.searchInvestors(q);
+        potentialTable.setData(results.potential);
+        confirmedTable.setData(results.confirmed);
+        showSection(results.confirmed.length >= results.potential.length ? 'confirmed' : 'potential');
+        toast(`Found ${results.confirmed.length + results.potential.length} results for "${q}"`, 'info');
+      }, 350));
+    }
+
+    function searchPotential(q) {
+      const results = window.APP.searchInvestors(q);
+      potentialTable.setData(results.potential);
+    }
+
+    function searchConfirmed(q) {
+      const results = window.APP.searchInvestors(q);
+      confirmedTable.setData(results.confirmed);
+    }
+
+    function renderMessages() {
+      const messages = window.APP.get('messages') || [];
+      const unread = messages.filter(m => !m.read).length;
+      document.getElementById('inbox-count').textContent = `${unread} unread`;
+
+      const list = document.getElementById('messages-list');
+      list.innerHTML = messages.map(msg => `
+        <div class="msg-item ${msg.read ? 'read' : 'unread'}" onclick="readMessage('${msg.id}')">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div class="msg-from">${msg.from}${!msg.read ? '<span class="unread-dot"></span>' : ''}</div>
+            <div class="msg-time">${new Date(msg.receivedAt).toLocaleDateString()}</div>
+          </div>
+          <div class="msg-subject">${msg.subject}</div>
+          <div class="msg-preview">${msg.body.slice(0, 70)}...</div>
+        </div>
+      `).join('');
+    }
+
+    function readMessage(msgId) {
+      window.APP.markMessageRead(msgId);
+      const messages = window.APP.get('messages') || [];
+      const msg = messages.find(m => m.id === msgId);
+      if (!msg) return;
+      document.getElementById('message-detail-panel').innerHTML = `
+        <div class="card-body" style="padding:28px">
+          <div style="margin-bottom:20px">
+            <div style="font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--gray-400);margin-bottom:4px">From</div>
+            <div style="font-weight:600">${msg.from} — <a href="mailto:${msg.email}" style="color:var(--haiti-blue)">${msg.email}</a></div>
+          </div>
+          <div style="margin-bottom:20px">
+            <div style="font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--gray-400);margin-bottom:4px">Subject</div>
+            <div style="font-weight:700;font-size:1.1rem">${msg.subject}</div>
+          </div>
+          <div style="margin-bottom:20px">
+            <div style="font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--gray-400);margin-bottom:8px">Message</div>
+            <div style="background:var(--gray-50);padding:16px;border-radius:8px;font-size:0.9rem;line-height:1.7;color:var(--gray-700)">${msg.body}</div>
+          </div>
+          <div style="display:flex;gap:10px">
+            <button class="btn btn-primary" onclick="openContactModal('_','${msg.from}','${msg.email}')">↩️ Reply</button>
+            <div style="font-size:0.8rem;color:var(--gray-400);align-self:center">Received: ${new Date(msg.receivedAt).toLocaleString()}</div>
+          </div>
+        </div>`;
+      renderMessages();
+      const stats = window.APP.getStats();
+      updateBadges(stats.unreadCount);
+    }
+
+    function updateBadges(count) {
+      const badge = document.getElementById('unread-badge');
+      const navBadge = document.getElementById('nav-msg-badge');
+      if (count > 0) {
+        badge.textContent = `${count} unread`;
+        badge.style.display = 'inline';
+        navBadge.textContent = count;
+        navBadge.style.display = 'inline';
+      } else {
+        badge.style.display = 'none';
+        navBadge.style.display = 'none';
+      }
+    }
+  </script>
+</body>
+</html>
