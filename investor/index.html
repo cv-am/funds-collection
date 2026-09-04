@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fon Nasyonal Ayiti — Haiti National Investment Fund</title>
+  <meta name="description" content="Join the Haiti National Investment Fund. Register as a potential investor and help rebuild Haiti's economic future through diaspora participation.">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- Toast Container -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- Navbar -->
+  <nav id="navbar" class="navbar"></nav>
+
+  <!-- Flag Divider -->
+  <div class="flag-divider"></div>
+
+  <!-- Main Content -->
+  <main id="main-content" class="page">
+    <!-- Hero Section -->
+    <section class="hero" id="hero-section">
+      <div class="hero-image">
+        <img src="hero.jpg" alt="Port-au-Prince, Haiti — Government District" loading="eager">
+        <div class="hero-image-overlay"></div>
+        <div class="hero-text-overlay" id="hero-text">
+          <h2 id="hero-title">Invest in Haiti's Future</h2>
+          <p id="hero-subtitle">Join thousands of Haitians worldwide in rebuilding our nation's economic foundation.</p>
+        </div>
+      </div>
+      <div class="hero-flag">
+        <div class="hero-flag-top"></div>
+        <div class="hero-flag-bottom"></div>
+        <div class="hero-flag-emblem" id="hero-emblem"></div>
+      </div>
+    </section>
+
+    <!-- Section Divider -->
+    <div class="section-divider"></div>
+
+    <!-- Main Body -->
+    <section class="page-section" style="background:var(--gray-50)">
+      <div class="container">
+        <!-- Content switches based on auth state -->
+        <div id="home-content"></div>
+      </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="page-section" style="background:white;border-top:1px solid var(--gray-100)">
+      <div class="container">
+        <div class="section-header text-center">
+          <div class="section-badge">🇭🇹 Why Invest?</div>
+          <h2 style="color:var(--haiti-blue)">Building a Stronger Haiti Together</h2>
+          <p style="max-width:600px;margin:12px auto">Your investment goes directly toward priority infrastructure, education, and economic development projects across Haiti.</p>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:28px" id="features-grid">
+          <div class="card">
+            <div class="card-body text-center">
+              <div style="font-size:2.5rem;margin-bottom:12px">🏗️</div>
+              <h3 style="font-size:1.1rem;margin-bottom:8px">Infrastructure</h3>
+              <p style="font-size:0.875rem">Roads, ports, hospitals, and schools — foundational projects that uplift all Haitian communities.</p>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-body text-center">
+              <div style="font-size:2.5rem;margin-bottom:12px">⚡</div>
+              <h3 style="font-size:1.1rem;margin-bottom:8px">Energy & Tech</h3>
+              <p style="font-size:0.875rem">Renewable energy installations and digital infrastructure to power Haiti's modern economy.</p>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-body text-center">
+              <div style="font-size:2.5rem;margin-bottom:12px">🌱</div>
+              <h3 style="font-size:1.1rem;margin-bottom:8px">Agriculture</h3>
+              <p style="font-size:0.875rem">Supporting Haitian farmers with modern tools, irrigation systems, and market access programs.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Stats Bar -->
+    <section style="background:linear-gradient(135deg,var(--haiti-blue) 0%,var(--haiti-blue-dark) 100%);padding:40px 0">
+      <div class="container">
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:24px;text-align:center" id="stats-bar">
+          <div>
+            <div style="font-size:2rem;font-weight:900;color:white" id="stat-confirmed">10</div>
+            <div style="font-size:0.8rem;color:rgba(255,255,255,0.65);margin-top:4px">Confirmed Investors</div>
+          </div>
+          <div>
+            <div style="font-size:2rem;font-weight:900;color:white" id="stat-potential">5</div>
+            <div style="font-size:0.8rem;color:rgba(255,255,255,0.65);margin-top:4px">Potential Investors</div>
+          </div>
+          <div>
+            <div style="font-size:2rem;font-weight:900;color:white" id="stat-received">—</div>
+            <div style="font-size:0.8rem;color:rgba(255,255,255,0.65);margin-top:4px">Total Invested</div>
+          </div>
+          <div>
+            <div style="font-size:2rem;font-weight:900;color:white">15+</div>
+            <div style="font-size:0.8rem;color:rgba(255,255,255,0.65);margin-top:4px">Countries Represented</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer id="site-footer" class="site-footer"></footer>
+
+  <script src="app.js"></script>
+  <script src="components.js"></script>
+  <script>
+    // ── Initialize Page ───────────────────────
+    document.addEventListener('DOMContentLoaded', function() {
+      renderNavbar();
+      renderFooter();
+      renderPageContent();
+    });
+
+    function renderPageContent() {
+      const user = window.APP.getCurrentUser();
+      const isAuth = !!user;
+
+      // Hero text
+      document.getElementById('hero-title').textContent = t('hero_title');
+      document.getElementById('hero-subtitle').textContent = t('hero_subtitle');
+
+      // Emblem in flag
+      document.getElementById('hero-emblem').innerHTML = HaitiEmblem({ size: 120, className: '' });
+
+      // Stats bar
+      const stats = window.APP.getStats();
+      document.getElementById('stat-confirmed').textContent = stats.confirmed;
+      document.getElementById('stat-potential').textContent = stats.potential;
+      document.getElementById('stat-received').textContent = formatCurrency(stats.totalReceived).replace('.00','');
+
+      // Main content switch
+      const homeContent = document.getElementById('home-content');
+      if (isAuth) {
+        // Show news panel for logged-in users
+        homeContent.innerHTML = `
+          <div style="display:grid;grid-template-columns:1fr 340px;gap:32px;align-items:start">
+            <div>
+              <div class="section-badge" style="margin-bottom:16px">👋 Welcome back, ${user.firstName}!</div>
+              <h2 style="color:var(--haiti-blue);margin-bottom:16px">Your Investor Dashboard</h2>
+              <div id="profile-summary-home"></div>
+              <div style="display:flex;gap:12px;margin-top:20px">
+                <a href="dashboard.html" class="btn btn-primary btn-lg">📊 Go to Dashboard</a>
+                ${user.status === 'potential' ? `<a href="payment.html" class="btn btn-red btn-lg">💳 Make Investment</a>` : ''}
+              </div>
+            </div>
+            <div id="news-panel-container"></div>
+          </div>`;
+        renderProfileSummary('profile-summary-home', user);
+        renderNewsPanel('news-panel-container');
+      } else {
+        // Show intro block for guests
+        homeContent.innerHTML = `
+          <div style="display:grid;grid-template-columns:1fr 340px;gap:32px;align-items:start">
+            <div class="intro-block">
+              <div style="margin-bottom:16px">${HaitiEmblem({ size: 56 })}</div>
+              <div class="section-badge" style="margin-bottom:16px">${t('hero_title')}</div>
+              <h2 id="intro-title">${t('intro_title')}</h2>
+              <p id="intro-body">${t('intro_body')}</p>
+              <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+                <a href="register.html" class="btn btn-primary btn-xl" id="cta-register">${t('cta_register')}</a>
+                <a href="login.html" class="btn btn-outline btn-xl">I Already Have an ID</a>
+              </div>
+              <p style="font-size:0.8rem;color:var(--gray-400);margin-top:20px">
+                🔒 Your data is protected. Registration is free and no payment is required today.
+              </p>
+            </div>
+            <div id="news-panel-container"></div>
+          </div>`;
+        renderNewsPanel('news-panel-container');
+      }
+
+      // Responsive features grid
+      const w = window.innerWidth;
+      if (w < 768) {
+        document.getElementById('features-grid').style.gridTemplateColumns = '1fr';
+        document.getElementById('stats-bar').style.gridTemplateColumns = 'repeat(2,1fr)';
+      }
+    }
+
+    window.addEventListener('resize', renderPageContent);
+  </script>
+</body>
+</html>

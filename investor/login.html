@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Log In — Haiti National Investment Fund</title>
+  <meta name="description" content="Access your investor account with your ID number and contact information.">
+  <link rel="stylesheet" href="styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div id="toast-container" class="toast-container"></div>
+  <nav id="navbar" class="navbar"></nav>
+  <div class="flag-divider"></div>
+
+  <main class="page" style="min-height:calc(100vh - 140px);display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#F0F4FF 0%,#FFF5F6 100%);padding:40px 16px">
+    <div style="width:100%;max-width:460px">
+      <!-- Header -->
+      <div class="text-center" style="margin-bottom:32px">
+        <div id="login-emblem"></div>
+        <h1 style="font-family:var(--font-display);color:var(--haiti-blue);margin-top:16px;font-size:1.8rem">Investor Portal</h1>
+        <p style="color:var(--gray-500);margin-top:6px">Access your investment account</p>
+      </div>
+
+      <!-- Login Card -->
+      <div class="card" style="border-radius:var(--radius-xl);overflow:visible">
+        <div style="height:6px;background:linear-gradient(to right,var(--haiti-blue),var(--haiti-red));border-radius:var(--radius-xl) var(--radius-xl) 0 0"></div>
+        <div class="card-body" style="padding:32px">
+          <form id="login-form" novalidate>
+            <div class="form-group" style="margin-bottom:20px">
+              <label class="form-label" for="login-id">
+                ID Number or Email <span class="required">*</span>
+              </label>
+              <div class="input-with-icon">
+                <span class="input-icon">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                </span>
+                <input type="text" class="form-control" id="login-id"
+                  placeholder="Your 6-digit ID or email address"
+                  autocomplete="username" required>
+              </div>
+              <span class="form-error hidden" id="error-id">Please enter your ID number or email.</span>
+            </div>
+
+            <div class="form-group" style="margin-bottom:28px">
+              <label class="form-label" for="login-contact">
+                Email / WhatsApp / Phone <span class="required">*</span>
+              </label>
+              <div class="input-with-icon">
+                <span class="input-icon">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.15 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.06 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                </span>
+                <input type="text" class="form-control" id="login-contact"
+                  placeholder="Email or phone number on file"
+                  autocomplete="current-password" required>
+              </div>
+              <span class="form-error hidden" id="error-contact">Please enter your contact information.</span>
+            </div>
+
+            <div id="login-error" class="hidden" style="background:#FFF1F2;border:1px solid #FECDD3;border-radius:var(--radius-sm);padding:12px 16px;margin-bottom:20px;font-size:0.875rem;color:var(--haiti-red)">
+              ❌ No account found with those credentials. Please check and try again.
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-full btn-lg" id="login-btn">
+              <span id="login-btn-text">Sign In to My Account</span>
+              <span id="login-spinner" class="spinner hidden"></span>
+            </button>
+          </form>
+
+          <div class="divider"></div>
+
+          <!-- Demo credentials hint -->
+          <div style="background:var(--gray-50);border-radius:var(--radius-sm);padding:14px;font-size:0.8rem;color:var(--gray-500)">
+            <div style="font-weight:600;color:var(--gray-600);margin-bottom:6px">💡 Demo Credentials</div>
+            <div style="display:flex;flex-direction:column;gap:4px">
+              <div><strong>ID:</strong> 100001 &nbsp;|&nbsp; <strong>Contact:</strong> marie.dubois@gmail.com</div>
+              <div><strong>ID:</strong> 100003 &nbsp;|&nbsp; <strong>Contact:</strong> claudette.p@yahoo.fr</div>
+            </div>
+          </div>
+
+          <div style="text-align:center;margin-top:20px">
+            <p style="font-size:0.85rem;color:var(--gray-500)">
+              Don't have an account?
+              <a href="register.html" style="color:var(--haiti-blue);font-weight:600">Register as investor</a>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="text-center" style="margin-top:20px">
+        <a href="index.html" style="font-size:0.85rem;color:var(--gray-400)">← Back to Home</a>
+      </div>
+    </div>
+  </main>
+
+  <footer id="site-footer" class="site-footer"></footer>
+
+  <script src="app.js"></script>
+  <script src="components.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Redirect if already logged in
+      if (window.APP.getCurrentUser()) {
+        window.location.href = 'dashboard.html';
+        return;
+      }
+      renderNavbar();
+      renderFooter();
+      document.getElementById('login-emblem').innerHTML = HaitiEmblem({ size: 72 });
+
+      // Form submission
+      document.getElementById('login-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const idInput      = document.getElementById('login-id');
+        const contactInput = document.getElementById('login-contact');
+        const errorDiv     = document.getElementById('login-error');
+
+        let valid = true;
+        document.getElementById('error-id').classList.add('hidden');
+        document.getElementById('error-contact').classList.add('hidden');
+        errorDiv.classList.add('hidden');
+        idInput.classList.remove('is-invalid');
+        contactInput.classList.remove('is-invalid');
+
+        if (!idInput.value.trim()) {
+          document.getElementById('error-id').classList.remove('hidden');
+          idInput.classList.add('is-invalid');
+          valid = false;
+        }
+        if (!contactInput.value.trim()) {
+          document.getElementById('error-contact').classList.remove('hidden');
+          contactInput.classList.add('is-invalid');
+          valid = false;
+        }
+        if (!valid) return;
+
+        // Show loading
+        const btn = document.getElementById('login-btn');
+        const btnText = document.getElementById('login-btn-text');
+        const spinner = document.getElementById('login-spinner');
+        btn.disabled = true;
+        btnText.textContent = 'Signing in...';
+        spinner.classList.remove('hidden');
+
+        setTimeout(() => {
+          const investor = window.APP.findInvestorByCredentials(idInput.value.trim(), contactInput.value.trim());
+          btn.disabled = false;
+          btnText.textContent = 'Sign In to My Account';
+          spinner.classList.add('hidden');
+
+          if (investor) {
+            window.APP.login(investor);
+            toast(`Welcome back, ${investor.firstName}!`, 'success');
+            setTimeout(() => window.location.href = 'dashboard.html', 900);
+          } else {
+            errorDiv.classList.remove('hidden');
+            idInput.classList.add('is-invalid');
+            contactInput.classList.add('is-invalid');
+          }
+        }, 1200);
+      });
+    });
+  </script>
+</body>
+</html>

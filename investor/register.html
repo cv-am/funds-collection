@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register as Investor — Haiti National Investment Fund</title>
+  <meta name="description" content="Register as a potential investor in the Haiti National Investment Fund. Select your investment range and complete your profile.">
+  <link rel="stylesheet" href="styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div id="toast-container" class="toast-container"></div>
+  <nav id="navbar" class="navbar"></nav>
+  <div class="flag-divider"></div>
+
+  <main class="page" style="min-height:calc(100vh - 120px);background:var(--gray-50);padding:48px 0">
+    <div class="container-sm">
+
+      <!-- Step Indicator -->
+      <div id="step-indicator" style="margin-bottom:40px"></div>
+
+      <!-- STEP 1: Amount Selection -->
+      <div id="step-1" class="page">
+        <div class="section-header text-center">
+          <div class="section-badge">Step 1 of 2</div>
+          <h1 style="color:var(--haiti-blue);margin-bottom:8px">Select Your Investment Range</h1>
+          <p>Choose the amount range you'd like to invest. You can specify the exact amount below.</p>
+          <p style="font-size:0.85rem;color:var(--haiti-red);margin-top:4px"><strong>No payment is required today.</strong> This is registration only.</p>
+        </div>
+
+        <div id="amount-tiles-container" style="margin-bottom:32px"></div>
+
+        <div id="amount-error" class="hidden" style="background:#FFF1F2;border:1px solid #FECDD3;border-radius:var(--radius-sm);padding:12px 16px;margin-bottom:20px;font-size:0.875rem;color:var(--haiti-red)">
+          ❌ Please select an investment range and enter an amount.
+        </div>
+
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
+          <a href="index.html" class="btn btn-ghost">← Back</a>
+          <button class="btn btn-primary btn-lg" id="next-to-profile" onclick="goToStep2()">
+            Continue to Profile →
+          </button>
+        </div>
+      </div>
+
+      <!-- STEP 2: Profile Form -->
+      <div id="step-2" class="hidden page">
+        <div class="section-header text-center">
+          <div class="section-badge">Step 2 of 2</div>
+          <h1 style="color:var(--haiti-blue);margin-bottom:8px">Complete Your Profile</h1>
+          <p>Provide your contact information so we can reach you when your investment is processed.</p>
+        </div>
+
+        <div class="card" style="border-radius:var(--radius-xl)">
+          <div style="height:5px;background:linear-gradient(to right,var(--haiti-blue),var(--haiti-red));border-radius:var(--radius-xl) var(--radius-xl) 0 0"></div>
+          <div class="card-body" style="padding:36px">
+            <form id="profile-form" novalidate>
+              <!-- Selected amount summary -->
+              <div style="background:linear-gradient(135deg,#EEF2FF,#E0F2FE);border-radius:var(--radius-md);padding:16px 20px;margin-bottom:28px;display:flex;justify-content:space-between;align-items:center">
+                <div>
+                  <div style="font-size:0.75rem;font-weight:700;color:var(--gray-500);text-transform:uppercase;letter-spacing:0.05em">Selected Range</div>
+                  <div style="font-weight:700;color:var(--haiti-blue)" id="selected-range-display">—</div>
+                </div>
+                <div>
+                  <div style="font-size:0.75rem;font-weight:700;color:var(--gray-500);text-transform:uppercase;letter-spacing:0.05em">Exact Amount</div>
+                  <div style="font-weight:700;color:var(--haiti-blue);font-size:1.2rem" id="selected-amount-display">—</div>
+                </div>
+                <button type="button" class="btn btn-ghost btn-sm" onclick="goToStep1()">✏️ Change</button>
+              </div>
+
+              <div class="form-row" style="margin-bottom:20px">
+                <div class="form-group">
+                  <label class="form-label" for="first-name">First Name <span class="required">*</span></label>
+                  <input type="text" class="form-control" id="first-name" placeholder="Marie" autocomplete="given-name" required>
+                  <span class="form-error hidden" id="err-first-name">Required</span>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="last-name">Last Name <span class="required">*</span></label>
+                  <input type="text" class="form-control" id="last-name" placeholder="Dupont" autocomplete="family-name" required>
+                  <span class="form-error hidden" id="err-last-name">Required</span>
+                </div>
+              </div>
+
+              <div class="form-group" style="margin-bottom:20px">
+                <label class="form-label" for="email">Email Address <span class="required">*</span></label>
+                <input type="email" class="form-control" id="email" placeholder="marie.dupont@gmail.com" autocomplete="email" required>
+                <span class="form-error hidden" id="err-email">Please enter a valid email address.</span>
+              </div>
+
+              <div class="form-group" style="margin-bottom:20px">
+                <label class="form-label" for="whatsapp">WhatsApp Number <span class="required">*</span></label>
+                <input type="tel" class="form-control" id="whatsapp" placeholder="+1-305-555-0100" autocomplete="tel" required>
+                <span class="form-help">Include country code (e.g. +1 for USA, +33 for France)</span>
+                <span class="form-error hidden" id="err-whatsapp">Please enter your WhatsApp number.</span>
+              </div>
+
+              <div class="form-row" style="margin-bottom:28px">
+                <div class="form-group">
+                  <label class="form-label">Amount</label>
+                  <input type="text" class="form-control" id="form-amount" readonly>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Date</label>
+                  <input type="text" class="form-control" id="form-date" readonly>
+                </div>
+              </div>
+
+              <div style="display:flex;gap:12px;justify-content:space-between">
+                <button type="button" class="btn btn-ghost btn-lg" onclick="goToStep1()">← Back</button>
+                <button type="submit" class="btn btn-primary btn-lg" id="submit-btn">
+                  <span id="submit-btn-text">Submit Registration ✓</span>
+                  <span id="submit-spinner" class="spinner hidden"></span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 3: Success Screen -->
+      <div id="step-3" class="hidden">
+        <div class="success-screen" id="success-content">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <footer id="site-footer" class="site-footer"></footer>
+
+  <script src="app.js"></script>
+  <script src="components.js"></script>
+  <script>
+    let currentStep = 1;
+
+    document.addEventListener('DOMContentLoaded', function() {
+      renderNavbar();
+      renderFooter();
+      renderAmountTiles('amount-tiles-container', null, '');
+      renderSteps('step-indicator', ['Investment Range', 'Your Profile', 'Confirmation'], 1);
+
+      // Set today's date
+      document.getElementById('form-date').value = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+    });
+
+    function onAmountSelected(rangeId, rangeLabel, amount) {
+      document.getElementById('selected-range-display').textContent = rangeLabel;
+      document.getElementById('selected-amount-display').textContent = amount ? formatCurrency(parseFloat(amount)) : '—';
+      document.getElementById('form-amount').value = amount ? `${rangeLabel} — ${formatCurrency(parseFloat(amount))}` : rangeLabel;
+    }
+
+    function goToStep2() {
+      // Validate amount selection
+      if (!_selectedTileId || !_selectedAmount || parseFloat(_selectedAmount) <= 0) {
+        document.getElementById('amount-error').classList.remove('hidden');
+        document.getElementById('amount-tiles-container').scrollIntoView({ behavior: 'smooth' });
+        return;
+      }
+      document.getElementById('amount-error').classList.add('hidden');
+      currentStep = 2;
+      document.getElementById('step-1').classList.add('hidden');
+      document.getElementById('step-2').classList.remove('hidden');
+      document.getElementById('step-2').classList.add('page');
+      renderSteps('step-indicator', ['Investment Range', 'Your Profile', 'Confirmation'], 2);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function goToStep1() {
+      currentStep = 1;
+      document.getElementById('step-2').classList.add('hidden');
+      document.getElementById('step-1').classList.remove('hidden');
+      renderSteps('step-indicator', ['Investment Range', 'Your Profile', 'Confirmation'], 1);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Profile form submission
+    document.addEventListener('submit', function(e) {
+      if (e.target.id !== 'profile-form') return;
+      e.preventDefault();
+
+      const firstName = document.getElementById('first-name').value.trim();
+      const lastName  = document.getElementById('last-name').value.trim();
+      const email     = document.getElementById('email').value.trim();
+      const whatsapp  = document.getElementById('whatsapp').value.trim();
+
+      // Clear errors
+      ['first-name','last-name','email','whatsapp'].forEach(f => {
+        document.getElementById(`err-${f}`).classList.add('hidden');
+        document.getElementById(f).classList.remove('is-invalid');
+      });
+
+      let valid = true;
+      if (!firstName) { showErr('first-name'); valid = false; }
+      if (!lastName)  { showErr('last-name');  valid = false; }
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showErr('email'); valid = false; }
+      if (!whatsapp)  { showErr('whatsapp');   valid = false; }
+      if (!valid) return;
+
+      // Loading
+      const btn = document.getElementById('submit-btn');
+      btn.disabled = true;
+      document.getElementById('submit-btn-text').textContent = 'Registering...';
+      document.getElementById('submit-spinner').classList.remove('hidden');
+
+      setTimeout(() => {
+        const investor = window.APP.registerPotential({
+          firstName, lastName, email, whatsapp,
+          amountRange: _selectedLabel,
+          exactAmount: parseFloat(_selectedAmount),
+          country: 'Unknown'
+        });
+
+        showSuccess(investor);
+      }, 1500);
+    });
+
+    function showErr(field) {
+      document.getElementById(`err-${field}`).classList.remove('hidden');
+      document.getElementById(field).classList.add('is-invalid');
+    }
+
+    function showSuccess(investor) {
+      currentStep = 3;
+      document.getElementById('step-2').classList.add('hidden');
+      document.getElementById('step-3').classList.remove('hidden');
+      renderSteps('step-indicator', ['Investment Range', 'Your Profile', 'Confirmation'], 3);
+
+      document.getElementById('success-content').innerHTML = `
+        <div style="margin-bottom:24px">${HaitiEmblem({ size: 80 })}</div>
+        <div class="success-icon-wrapper">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="3">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+        </div>
+        <h2 style="color:var(--haiti-blue);font-family:var(--font-display);font-size:2rem;margin-bottom:8px">
+          Thank You, ${investor.firstName}!
+        </h2>
+        <p style="color:var(--gray-600);max-width:420px;margin:0 auto 24px">
+          Your registration has been received. You are now registered as a <strong>Potential Investor</strong> with the Haiti National Investment Fund.
+        </p>
+
+        <div class="success-id-display">
+          <div class="id-lbl">Your Investor ID Number</div>
+          <div class="id-num">${investor.id}</div>
+          <div class="id-lbl" style="margin-top:8px">Keep this number safe — you'll need it to log in</div>
+        </div>
+
+        <div style="background:var(--gray-50);border-radius:var(--radius-md);padding:20px;max-width:420px;margin:24px auto;text-align:left">
+          <div style="font-size:0.875rem;color:var(--gray-700);font-weight:600;margin-bottom:8px">📋 Summary</div>
+          <div class="profile-row" style="color:var(--gray-700)">
+            <span style="color:var(--gray-500);font-size:0.85rem">Name</span>
+            <span style="font-weight:600">${investor.firstName} ${investor.lastName}</span>
+          </div>
+          <div class="profile-row" style="color:var(--gray-700)">
+            <span style="color:var(--gray-500);font-size:0.85rem">Investment Range</span>
+            <span style="font-weight:600">${investor.amountRange}</span>
+          </div>
+          <div class="profile-row" style="color:var(--gray-700)">
+            <span style="color:var(--gray-500);font-size:0.85rem">Amount</span>
+            <span style="font-weight:600;color:var(--haiti-blue)">${formatCurrency(investor.exactAmount)}</span>
+          </div>
+          <div class="profile-row" style="color:var(--gray-700)">
+            <span style="color:var(--gray-500);font-size:0.85rem">Registered</span>
+            <span style="font-weight:600">${formatDate(investor.registeredAt)}</span>
+          </div>
+        </div>
+
+        <div style="background:#EEF2FF;border-radius:var(--radius-md);padding:16px;max-width:420px;margin:0 auto 32px;font-size:0.875rem;color:var(--haiti-blue)">
+          📧 You will be contacted by our team via <strong>${investor.email}</strong> and <strong>${investor.whatsapp}</strong> within 3–5 business days with next steps.
+        </div>
+
+        <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+          <a href="dashboard.html" class="btn btn-primary btn-lg">Go to My Dashboard →</a>
+          <a href="payment.html" class="btn btn-red btn-lg">💳 Invest Now</a>
+        </div>
+      `;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>News & Updates — Haiti National Investment Fund</title>
+  <meta name="description" content="Latest news, announcements, and updates from the Haiti National Investment Fund.">
+  <link rel="stylesheet" href="styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div id="toast-container" class="toast-container"></div>
+  <nav id="navbar" class="navbar"></nav>
+  <div class="flag-divider"></div>
+
+  <!-- Page Header -->
+  <div style="background:linear-gradient(135deg,var(--haiti-blue) 0%,var(--haiti-blue-dark) 100%);padding:56px 0;text-align:center">
+    <div class="container">
+      <div id="news-page-emblem" style="margin-bottom:16px;display:flex;justify-content:center"></div>
+      <h1 style="color:white;font-family:var(--font-display);font-size:2.5rem;margin-bottom:12px">News & Announcements</h1>
+      <p style="color:rgba(255,255,255,0.75);max-width:560px;margin:0 auto">Stay up to date with the latest news, updates, and opportunities from the Haiti National Investment Fund.</p>
+    </div>
+  </div>
+  <div class="section-divider"></div>
+
+  <main class="page" style="background:var(--gray-50);padding:56px 0">
+    <div class="container">
+      <div style="display:grid;grid-template-columns:1fr 300px;gap:36px;align-items:start" id="news-layout">
+
+        <!-- Main News Feed -->
+        <div id="news-feed"></div>
+
+        <!-- Sidebar -->
+        <div>
+          <div class="card" style="margin-bottom:20px">
+            <div class="card-body">
+              <h3 style="font-size:1rem;margin-bottom:16px;color:var(--haiti-blue)">📣 Quick Links</h3>
+              <div style="display:flex;flex-direction:column;gap:10px">
+                <a href="register.html" class="btn btn-primary btn-full">Register as Investor</a>
+                <a href="login.html" class="btn btn-outline btn-full">Sign In</a>
+                <a href="contact.html" class="btn btn-ghost btn-full">Contact Us</a>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-body">
+              <h3 style="font-size:1rem;margin-bottom:16px;color:var(--haiti-blue)">🏴‍☠️ About the Fund</h3>
+              <p style="font-size:0.85rem;margin-bottom:12px">The Haiti National Investment Fund (Fon Nasyonal Ayiti) is a government-backed initiative launched in 2026.</p>
+              <p style="font-size:0.85rem;margin-bottom:12px">Our mission is to channel diaspora and international investment into targeted development projects across Haiti.</p>
+              <div style="display:flex;justify-content:center;margin-top:16px">
+                <div id="sidebar-flag"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer id="site-footer" class="site-footer"></footer>
+
+  <script src="app.js"></script>
+  <script src="components.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      renderNavbar();
+      renderFooter();
+      document.getElementById('news-page-emblem').innerHTML = HaitiEmblem({ size: 64 });
+      document.getElementById('sidebar-flag').innerHTML = HaitiFlag({ size: 80 });
+
+      const news = window.APP.get('news') || [];
+      const feed = document.getElementById('news-feed');
+
+      if (news.length === 0) {
+        feed.innerHTML = '<div style="text-align:center;color:var(--gray-400);padding:60px 0">No news items yet.</div>';
+        return;
+      }
+
+      feed.innerHTML = news.map((item, idx) => `
+        <article class="card" style="margin-bottom:20px;transition:var(--transition)" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+          <div style="height:4px;background:${idx % 2 === 0 ? 'var(--haiti-blue)' : 'var(--haiti-red)'}"></div>
+          <div class="card-body" style="padding:28px">
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+              <div style="background:${idx % 2 === 0 ? '#EEF2FF' : '#FFF1F2'};color:${idx % 2 === 0 ? 'var(--haiti-blue)' : 'var(--haiti-red)'};font-size:0.75rem;font-weight:700;padding:4px 12px;border-radius:20px;text-transform:uppercase;letter-spacing:0.05em">
+                ${formatDate(item.date)}
+              </div>
+              ${item.isNew ? '<span class="badge badge-yellow">🆕 NEW</span>' : ''}
+            </div>
+            <h2 style="font-size:1.2rem;color:var(--gray-900);margin-bottom:10px">${item.title}</h2>
+            <p style="font-size:0.9rem;line-height:1.7">${item.excerpt}</p>
+            <div style="margin-top:16px">
+              <button class="btn btn-ghost btn-sm" onclick="toast('Full article coming soon!','info')">Read More →</button>
+            </div>
+          </div>
+        </article>
+      `).join('');
+
+      // Responsive
+      if (window.innerWidth < 768) {
+        document.getElementById('news-layout').style.gridTemplateColumns = '1fr';
+      }
+    });
+  </script>
+</body>
+</html>
